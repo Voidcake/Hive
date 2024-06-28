@@ -1,6 +1,7 @@
 import os
 
 from neomodel import config, adb
+from neomodel.exceptions import NeomodelException
 
 import logging
 
@@ -31,7 +32,7 @@ async def _test_db_connection():
     try:
         await adb.cypher_query("MATCH (n) RETURN n LIMIT 1")
         logging.info("Database connection successful")
-    except Exception as e:
+    except NeomodelException as e:
         logging.error(f"Failed to connect to Neo4j database. Error: {str(e)}")
 
 
@@ -40,6 +41,6 @@ async def _purge_db():
         async with adb.transaction:
             await adb.cypher_query("MATCH (n) DETACH DELETE n")
             logging.info("Database Emptied.")
-    except Exception as e:
+    except NeomodelException as e:
         logging.error(f"Failed to purge Neo4j database. Error: {str(e)}")
         raise

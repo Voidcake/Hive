@@ -1,18 +1,25 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
-from core.config import configure_app
-
-app = FastAPI(title="Hive API", description="An API for Collective Sensemaking")
-
-
-@app.on_event("startup")
-async def startup_event():
-    await configure_app()
+import src.core.config as config
+from src.core.gql_schema import graphql_app
 
 
-@app.on_event("shutdown")
-async def shutdown_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    await config.configure_app()
+
+    yield
+
+    # Shutdown
     pass
+
+
+app = FastAPI(title="Hive API", description="An API for Collective Sensemaking", lifespan=lifespan)
+
+app.include_router(graphql_app, prefix="/graphql", tags=["GraphQL"])
 
 
 @app.get("/")

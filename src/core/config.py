@@ -4,9 +4,10 @@ from dotenv import load_dotenv
 
 from core.db_utils import setup_db
 
+load_dotenv(".env")
+
 
 async def configure_app():
-    load_dotenv()
     configure_logger()
     await setup_db(test_connection=True)
 
