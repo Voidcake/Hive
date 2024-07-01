@@ -1,6 +1,9 @@
+from typing import List
+
 from passlib.context import CryptContext
 
-from app.user.user import User
+from src.app.user.user import User
+from src.app.townsquare.townsquare import Townsquare
 from src.app.user.user_repository import UserRepository
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -32,6 +35,15 @@ class UserService:
 
     async def delete_user(self, uid: str) -> str:
         return await self.user_repository.delete(uid)
+
+    async def get_all_townsquare_memberships(self, user_id: str) -> List[Townsquare]:
+        return await self.user_repository.get_all_townsquare_memberships(user_id)
+
+    async def join_townsquare(self, user_id: str, townsquare_id: str) -> User:
+        return await self.user_repository.join_townsquare(user_id, townsquare_id)
+
+    async def leave_townsquare(self, user_id: str, townsquare_id: str) -> User:
+        return await self.user_repository.leave_townsquare(user_id, townsquare_id)
 
 
 def get_user_service() -> UserService:

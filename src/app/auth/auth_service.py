@@ -7,7 +7,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 
-from app.user.user import User
+from src.app.user.user import User
 from src.app.user.user_service import get_user_service
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")

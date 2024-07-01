@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class CRUDRepository(ABC):
+class ICRUDRepository(ABC):
 
     @abstractmethod
     async def create(self, entity):

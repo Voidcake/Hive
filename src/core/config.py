@@ -9,7 +9,7 @@ load_dotenv(".env")
 
 async def configure_app():
     configure_logger()
-    await setup_db(test_connection=True)
+    await setup_db(test_connection=True, update_constraints=False)
 
 
 def configure_logger(level=logging.INFO):

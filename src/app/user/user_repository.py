@@ -1,15 +1,17 @@
 import logging
+from typing import List
 
 from neomodel import adb
 from neomodel.exceptions import UniqueProperty, DoesNotExist
-from src.infra.db.crud_repository_interface import CRUDRepository
-from src.infra.db.graph_repository_interface import GraphRepository
+
+from src.app.townsquare.townsquare import Townsquare
+from src.app.user.user import User
+from src.infra.db.crud_repository_interface import ICRUDRepository
 from src.infra.db.db_types import GraphDataTypes as types
+from src.infra.db.graph_repository_interface import IGraphRepository
 
-from app.user.user import User
 
-
-class UserRepository(CRUDRepository, GraphRepository):
+class UserRepository(ICRUDRepository, IGraphRepository):
 
     @staticmethod
     async def create(new_user: User) -> User:
@@ -34,7 +36,7 @@ class UserRepository(CRUDRepository, GraphRepository):
         return user
 
     @staticmethod
-    async def get_all() -> list[User]:
+    async def get_all() -> List[User]:
         return await User.nodes.all()
 
     async def update(self, uid: str, **kwargs) -> User:
@@ -75,13 +77,56 @@ class UserRepository(CRUDRepository, GraphRepository):
             logging.error(f"Error deleting User with ID '{uid}': {str(e)}")
             raise e
 
+    # Townsquare Memberships
+    async def get_all_townsquare_memberships(self, user_uid: str) -> List[Townsquare]:
+        try:
+            user: User = await self.get(user_uid)
+            return await user.communities.all()
+        except Exception as e:
+            logging.error(f"Error getting all Townsquare Memberships of User with ID '{user_uid}': {str(e)}")
+            raise e
+
+    async def join_townsquare(self, user_uid: str, townsquare_id: str) -> User:
+        try:
+            user: User = await self.get(user_uid)
+            townsquare: Townsquare = await Townsquare.nodes.get_or_none(uid=townsquare_id)
+            if not townsquare:
+                raise LookupError(f"The Townsquare with ID '{townsquare_id}' not found in the Database")
+            async with adb.transaction:
+                await user.townsquare_memberships.connect(townsquare)
+                return await user.save()
+        except DoesNotExist as e:
+            logging.error(f"The User with ID '{user_uid}' not found in the Database: {str(e)}")
+            raise LookupError(f"The User with ID '{user_uid}' not found in the Database") from e
+        except Exception as e:
+            logging.error(f"Error joining User with ID '{user_uid}' to Townsquare: {str(e)}")
+            raise e
+
+    async def leave_townsquare(self, user_uid: str, townsquare_id: str) -> User:
+        try:
+            user: User = await self.get(user_uid)
+            townsquare: Townsquare = await Townsquare.nodes.get_or_none(uid=townsquare_id)
+            if not townsquare:
+                raise LookupError(f"The Townsquare with ID '{townsquare_id}' not found in the Database")
+            async with adb.transaction:
+                await user.townsquare_memberships.disconnect(townsquare)
+                return await user.save()
+        except DoesNotExist as e:
+            logging.error(f"The User with ID '{user_uid}' not found in the Database: {str(e)}")
+            raise LookupError(f"The User with ID '{user_uid}' not found in the Database") from e
+        except Exception as e:
+            logging.error(f"Error leaving User with ID '{user_uid}' from Townsquare: {str(e)}")
+            raise e
+
+    # Graph Constraints
+
     async def add_database_constraints(self, label: str, constraints=None):
         constraints: dict = {
             "node": {
                 "uid":             ("unique", "required", types.STRING),
                 "username":        ("unique", "required", types.STRING),
                 "email":           ("unique", "required", types.STRING),
-                "hashed_password": ("required", types.STRING),
+                "password":        ("required", types.STRING),
                 "first_name":      ("required", types.STRING)
             }
         }

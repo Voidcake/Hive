@@ -1,17 +1,22 @@
+import logging
 import os
 
 from neomodel import config, adb
 from neomodel.exceptions import NeomodelException
 
-import logging
+from src.app.townsquare.townsquare_repository import TownsquareRepository
+from src.app.user.user_repository import UserRepository
 
 
-async def setup_db(database_name: str = "neo4j", test_connection: bool = False, purge_db: bool = False) -> None:
+async def setup_db(database_name: str = "neo4j", test_connection: bool = False, purge_db: bool = False,
+                   update_constraints: bool = False) -> None:
     _configure_neomodel(database_name)
     if test_connection:
         await _test_db_connection()
     if purge_db:
         await _purge_db()
+    if update_constraints:
+        await _update_constraints()
 
 
 def _configure_neomodel(database: str = "neo4j") -> None:
@@ -43,4 +48,15 @@ async def _purge_db():
             logging.info("Database Emptied.")
     except NeomodelException as e:
         logging.error(f"Failed to purge Neo4j database. Error: {str(e)}")
+        raise
+
+
+async def _update_constraints():
+    try:
+        user_repo = UserRepository()
+        townsquare_repo = TownsquareRepository()
+        await user_repo.add_database_constraints(label="User")
+        await townsquare_repo.add_database_constraints(label="Townsquare")
+    except Exception as e:
+        logging.error(f"Error updating database constraints: {str(e)}")
         raise

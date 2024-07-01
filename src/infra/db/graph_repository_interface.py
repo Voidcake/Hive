@@ -6,7 +6,7 @@ from neomodel import adb
 from infra.db.db_types import GraphDataTypes
 
 
-class GraphRepository(ABC):
+class IGraphRepository(ABC):
 
     @abstractmethod
     async def add_database_constraints(self, label: str, constraints: dict = None):
