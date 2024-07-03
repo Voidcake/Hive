@@ -18,23 +18,23 @@ class UserService:
         new_user: User = User(username=username,
                               email=email,
                               password=pwd_context.hash(password),
-                              first_name=first_name)
+                              first_name=first_name.capitalize())
         return await self.user_repository.create(new_user)
 
-    async def get_user_via_id(self, uid: str) -> User:
-        return await self.user_repository.get(uid)
+    async def get_user_via_id(self, user_id: str) -> User:
+        return await self.user_repository.get(user_id)
 
     async def get_user_via_username(self, username: str) -> User:
         return await self.user_repository.get_via_username(username)
 
-    async def get_all_users(self) -> list[User]:
+    async def get_all_users(self) -> List[User]:
         return await self.user_repository.get_all()
 
-    async def update_user(self, uid: str, **kwargs) -> User:
-        return await self.user_repository.update(uid, **kwargs)
+    async def update_user(self, user_id: str, **kwargs) -> User:
+        return await self.user_repository.update(user_id, **kwargs)
 
-    async def delete_user(self, uid: str) -> str:
-        return await self.user_repository.delete(uid)
+    async def delete_user(self, user_id: str) -> str:
+        return await self.user_repository.delete(user_id)
 
     async def get_all_townsquare_memberships(self, user_id: str) -> List[Townsquare]:
         return await self.user_repository.get_all_townsquare_memberships(user_id)

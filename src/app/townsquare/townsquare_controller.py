@@ -1,6 +1,6 @@
 from typing import List
 
-from strawberry import type, mutation, field
+from strawberry import type, mutation, field, Info
 
 from src.app.townsquare.townsquare_schema import TownsquareIn, TownsquareType, TownsquareUpdateIn
 from src.app.townsquare.townsquare_service import get_townsquare_service, TownsquareService
@@ -19,16 +19,20 @@ class TownsquareQueries:
 @type
 class TownsquareMutations:
     @mutation
-    async def create_townsquare(self, new_townsquare: TownsquareIn) -> TownsquareType:
-        return await townsquare_service.create_townsquare(new_townsquare.name, new_townsquare.description)
+    async def create_townsquare(self, info: Info, new_townsquare: TownsquareIn) -> TownsquareType:
+        uid: str = await info.context.uid()
+        return await townsquare_service.create_townsquare(creator_id=uid, name=new_townsquare.name,
+                                                          description=new_townsquare.description)
 
     @mutation
-    async def update_townsquare(self, uid: str, updated_townsquare: TownsquareUpdateIn) -> TownsquareType:
-        return await townsquare_service.update_townsquare(uid, **vars(updated_townsquare))
+    async def update_townsquare(self, townsquare_id: str, updated_townsquare: TownsquareUpdateIn) -> TownsquareType:
+        return await townsquare_service.update_townsquare(townsquare_id, **vars(updated_townsquare))
 
     @mutation
-    async def delete_townsquare(self, uid: str) -> str:
-        return await townsquare_service.delete_townsquare(uid)
+    async def delete_townsquare(self, townsquare_id: str, confirmation: bool = False) -> str:
+        if not confirmation:
+            return "Deletion not confirmed"
+        return await townsquare_service.delete_townsquare(townsquare_id)
 
 
 @type

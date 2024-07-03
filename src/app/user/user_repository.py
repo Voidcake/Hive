@@ -22,10 +22,10 @@ class UserRepository(ICRUDRepository, IGraphRepository):
                 raise ValueError(f"Username '{new_user.username}' or Email '{new_user.email}' already exists")
 
     @staticmethod
-    async def get(uid: str) -> User:
-        user: User = await User.nodes.get_or_none(uid=uid)
+    async def get(user_id: str) -> User:
+        user: User = await User.nodes.get_or_none(uid=user_id)
         if not user:
-            raise LookupError(f"The User with ID '{uid}' not found in the Database")
+            raise LookupError(f"The User with ID '{user_id}' not found in the Database")
         return user
 
     @staticmethod
@@ -39,9 +39,9 @@ class UserRepository(ICRUDRepository, IGraphRepository):
     async def get_all() -> List[User]:
         return await User.nodes.all()
 
-    async def update(self, uid: str, **kwargs) -> User:
+    async def update(self, user_id: str, **kwargs) -> User:
         try:
-            user: User = await self.get(uid)
+            user: User = await self.get(user_id)
             for key, value in kwargs.items():
                 if value is not None:
                     old_name = getattr(user, key)
@@ -51,60 +51,63 @@ class UserRepository(ICRUDRepository, IGraphRepository):
             async with adb.transaction:
                 return await user.save()
         except DoesNotExist as e:
-            logging.error(f"The User with ID '{uid}' not found in the Database: {str(e)}")
-            raise LookupError(f"The User with ID '{uid}' not found in the Database") from e
+            logging.error(f"The User with ID '{user_id}' not found in the Database: {str(e)}")
+            raise LookupError(f"The User with ID '{user_id}' not found in the Database") from e
         except UniqueProperty as e:
             logging.error(
                 f"Username '{kwargs.get("username")}' or Email '{kwargs.get("email")}' already exists: {str(e)}")
             raise ValueError(
                 f"Username '{kwargs.get("username")}' or Email '{kwargs.get("email")}' already exists: {str(e)}") from e
         except Exception as e:
-            logging.error(f"Error updating User with ID '{uid}': {str(e)}")
+            logging.error(f"Error updating User with ID '{user_id}': {str(e)}")
             raise e
 
-    async def delete(self, uid: str) -> str:
+    async def delete(self, user_id: str) -> str:
         try:
-            user: User = await self.get(uid)
+            user: User = await self.get(user_id)
             async with adb.transaction:
                 await user.delete()
 
-            logging.info(f"User with ID '{uid}' deleted")
+            logging.info(f"User with ID '{user_id}' deleted")
             return f"User with username '{user.username}' deleted"
         except DoesNotExist as e:
-            logging.error(f"The User with ID '{uid}' not found in the Database: {str(e)}")
-            raise LookupError(f"The User with ID '{uid}' not found in the Database") from e
+            logging.error(f"The User with ID '{user_id}' not found in the Database: {str(e)}")
+            raise LookupError(f"The User with ID '{user_id}' not found in the Database") from e
         except Exception as e:
-            logging.error(f"Error deleting User with ID '{uid}': {str(e)}")
+            logging.error(f"Error deleting User with ID '{user_id}': {str(e)}")
             raise e
 
     # Townsquare Memberships
-    async def get_all_townsquare_memberships(self, user_uid: str) -> List[Townsquare]:
+    async def get_all_townsquare_memberships(self, user_id: str) -> List[Townsquare]:
         try:
-            user: User = await self.get(user_uid)
+            user: User = await self.get(user_id)
             return await user.communities.all()
         except Exception as e:
-            logging.error(f"Error getting all Townsquare Memberships of User with ID '{user_uid}': {str(e)}")
+            logging.error(f"Error getting all Townsquare Memberships of User with ID '{user_id}': {str(e)}")
             raise e
 
-    async def join_townsquare(self, user_uid: str, townsquare_id: str) -> User:
+    async def join_townsquare(self, user_id: str, townsquare_id: str) -> User:
         try:
-            user: User = await self.get(user_uid)
+            user: User = await self.get(user_id)
             townsquare: Townsquare = await Townsquare.nodes.get_or_none(uid=townsquare_id)
+
             if not townsquare:
                 raise LookupError(f"The Townsquare with ID '{townsquare_id}' not found in the Database")
+
             async with adb.transaction:
                 await user.townsquare_memberships.connect(townsquare)
                 return await user.save()
+
         except DoesNotExist as e:
-            logging.error(f"The User with ID '{user_uid}' not found in the Database: {str(e)}")
-            raise LookupError(f"The User with ID '{user_uid}' not found in the Database") from e
+            logging.error(f"The User with ID '{user_id}' not found in the Database: {str(e)}")
+            raise LookupError(f"The User with ID '{user_id}' not found in the Database") from e
         except Exception as e:
-            logging.error(f"Error joining User with ID '{user_uid}' to Townsquare: {str(e)}")
+            logging.error(f"Error joining User with ID '{user_id}' to Townsquare: {str(e)}")
             raise e
 
-    async def leave_townsquare(self, user_uid: str, townsquare_id: str) -> User:
+    async def leave_townsquare(self, user_id: str, townsquare_id: str) -> User:
         try:
-            user: User = await self.get(user_uid)
+            user: User = await self.get(user_id)
             townsquare: Townsquare = await Townsquare.nodes.get_or_none(uid=townsquare_id)
             if not townsquare:
                 raise LookupError(f"The Townsquare with ID '{townsquare_id}' not found in the Database")
@@ -112,10 +115,10 @@ class UserRepository(ICRUDRepository, IGraphRepository):
                 await user.townsquare_memberships.disconnect(townsquare)
                 return await user.save()
         except DoesNotExist as e:
-            logging.error(f"The User with ID '{user_uid}' not found in the Database: {str(e)}")
-            raise LookupError(f"The User with ID '{user_uid}' not found in the Database") from e
+            logging.error(f"The User with ID '{user_id}' not found in the Database: {str(e)}")
+            raise LookupError(f"The User with ID '{user_id}' not found in the Database") from e
         except Exception as e:
-            logging.error(f"Error leaving User with ID '{user_uid}' from Townsquare: {str(e)}")
+            logging.error(f"Error leaving User with ID '{user_id}' from Townsquare: {str(e)}")
             raise e
 
     # Graph Constraints

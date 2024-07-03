@@ -4,6 +4,7 @@ from strawberry import type, input, ID, Private, lazy
 
 if TYPE_CHECKING:
     from src.app.townsquare.townsquare_schema import TownsquareType, TownsquareIn
+    from src.app.townsquare.townsquare_schema import TownsquareType
 
 
 # INFO
@@ -18,6 +19,8 @@ class UserType:
     password: Private[str]
     first_name: str | None = None
     townsquare_memberships: List[Annotated["TownsquareType", lazy("src.app.townsquare.townsquare_schema")]] | None = None
+    townsquare_memberships: List[
+                                Annotated["TownsquareType", lazy("src.app.townsquare.townsquare_schema")]] | None = None
 
 
 @input
@@ -26,7 +29,6 @@ class UserIn:
     email: str
     password: str
     first_name: str | None = None
-    townsquare_memberships: List[Annotated["TownsquareIn", lazy("src.app.townsquare.townsquare_schema")]] | None = None
 
 
 @input
@@ -35,4 +37,3 @@ class UserUpdateIn:
     email: str | None = None
     password: str | None = None
     first_name: str | None = None
-    townsquare_memberships: List[Annotated["TownsquareIn", lazy("src.app.townsquare.townsquare_schema")]] | None = None

@@ -17,11 +17,9 @@ class TownsquareType:
 class TownsquareIn:
     name: str
     description: str | None = None
-    members: List[Annotated["UserIn", lazy("src.app.user.user_schema")]] | None = None
 
 
 @input
 class TownsquareUpdateIn:
     name: str | None = None
     description: str | None = None
-    members: List[Annotated["UserIn", lazy("src.app.user.user_schema")]] | None = None

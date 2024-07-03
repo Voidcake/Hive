@@ -14,7 +14,7 @@ class UserQueries:
     all_users: List[UserType] = field(resolver=user_service.get_all_users)
     user_by_id: UserType | None = field(resolver=user_service.get_user_via_id)
     user_by_username: UserType | None = field(resolver=user_service.get_user_via_username)
-    townsquare_memberships: List[TownsquareType] = field(resolver=user_service.get_all_townsquare_memberships)
+    all_townsquare_memberships: List[TownsquareType] = field(resolver=user_service.get_all_townsquare_memberships)
 
 
 @type
@@ -27,22 +27,24 @@ class UserMutations:
     @mutation
     async def update_current_user(self, info: Info, updated_user: UserUpdateIn) -> UserType:
         uid: str = await info.context.uid()
-        return await user_service.update_user(uid, **vars(updated_user))
+        return await user_service.update_user(user_id=uid, **vars(updated_user))
 
     @mutation
-    async def delete_current_user(self, info: Info) -> str:
+    async def delete_current_user(self, info: Info, confirmation: bool = False) -> str:
+        if not confirmation:
+            return "Deletion not confirmed"
         uid: str = await info.context.uid()
-        return await user_service.delete_user(uid)
+        return await user_service.delete_user(user_id=uid)
 
     @mutation
     async def join_townsquare(self, info: Info, townsquare_id: str) -> UserType:
         uid: str = await info.context.uid()
-        return await user_service.join_townsquare(uid, townsquare_id)
+        return await user_service.join_townsquare(user_id=uid, townsquare_id=townsquare_id)
 
     @mutation
     async def leave_townsquare(self, info: Info, townsquare_id: str) -> UserType:
         uid: str = await info.context.uid()
-        return await user_service.leave_townsquare(uid, townsquare_id)
+        return await user_service.leave_townsquare(user_id=uid, townsquare_id=townsquare_id)
 
 
 @type

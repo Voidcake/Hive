@@ -19,18 +19,18 @@ class TownsquareRepository(ICRUDRepository, IGraphRepository):
             except UniqueProperty:
                 raise ValueError(f"Townsquare '{new_townsquare.name}' already exists")
 
-    async def get(self, uid: str) -> Townsquare:
-        townsquare: Townsquare = await Townsquare.nodes.get_or_none(uid=uid)
+    async def get(self, townsquare_id: str) -> Townsquare:
+        townsquare: Townsquare = await Townsquare.nodes.get_or_none(uid=townsquare_id)
         if not townsquare:
-            raise LookupError(f"The Townsquare with ID '{uid}' not found in the Database")
+            raise LookupError(f"The Townsquare with ID '{townsquare_id}' not found in the Database")
         return townsquare
 
-    async def get_all(self) -> list[Townsquare]:
+    async def get_all(self) -> List[Townsquare]:
         return await Townsquare.nodes.all()
 
-    async def update(self, uid: str, **kwargs) -> Townsquare:
+    async def update(self, townsquare_id: str, **kwargs) -> Townsquare:
         try:
-            townsquare: Townsquare = await self.get(uid)
+            townsquare: Townsquare = await self.get(townsquare_id)
             for key, value in kwargs.items():
                 if value is not None:
                     old_value = getattr(townsquare, key)
@@ -39,26 +39,26 @@ class TownsquareRepository(ICRUDRepository, IGraphRepository):
             async with adb.transaction:
                 return await townsquare.save()
         except DoesNotExist as e:
-            logging.error(f"The Townsquare with ID '{uid}' not found in the Database: {str(e)}")
-            raise LookupError(f"The Townsquare with ID '{uid}' not found in the Database") from e
+            logging.error(f"The Townsquare with ID '{townsquare_id}' not found in the Database: {str(e)}")
+            raise LookupError(f"The Townsquare with ID '{townsquare_id}' not found in the Database") from e
         except UniqueProperty as e:
             logging.error(f"Townsquare '{kwargs.get('name')}' already exists: {str(e)}")
             raise ValueError(f"Townsquare '{kwargs.get('name')}' already exists: {str(e)}") from e
         except Exception as e:
-            logging.error(f"Error updating Townsquare with ID '{uid}': {str(e)}")
+            logging.error(f"Error updating Townsquare with ID '{townsquare_id}': {str(e)}")
             raise e
 
-    async def delete(self, uid: str) -> str:
+    async def delete(self, townsquare_id: str) -> str:
         try:
-            townsquare: Townsquare = await self.get(uid)
+            townsquare: Townsquare = await self.get(townsquare_id)
             async with adb.transaction:
                 await townsquare.delete()
-                return f"Townsquare with ID '{uid}' successfully deleted"
+                return f"Townsquare with ID '{townsquare_id}' successfully deleted"
         except DoesNotExist:
-            logging.error(f"The Townsquare with ID '{uid}' not found in the Database")
-            raise LookupError(f"The Townsquare with ID '{uid}' not found in the Database")
+            logging.error(f"The Townsquare with ID '{townsquare_id}' not found in the Database")
+            raise LookupError(f"The Townsquare with ID '{townsquare_id}' not found in the Database")
         except Exception as e:
-            logging.error(f"Error deleting Townsquare with ID '{uid}': {str(e)}")
+            logging.error(f"Error deleting Townsquare with ID '{townsquare_id}': {str(e)}")
             raise e
 
     # Members
