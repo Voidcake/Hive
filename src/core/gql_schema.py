@@ -1,25 +1,42 @@
+from importlib import import_module
+from pathlib import Path
+from functools import lru_cache
+
+
 from strawberry import type, Schema
-from strawberry.extensions import QueryDepthLimiter
+from strawberry.extensions import QueryDepthLimiter, MaxAliasesLimiter, MaxTokensLimiter
 from strawberry.fastapi import GraphQLRouter
 
 from src.app.auth.auth_context import get_user_context
-from src.app.auth.auth_controller import Mutation as AuthMutations
-from src.app.townsquare.townsquare_controller import Mutation as TownsquareMutations
-from src.app.townsquare.townsquare_controller import Query as TownsquareQueries
-from src.app.user.user_controller import Mutation as UserMutations
-from src.app.user.user_controller import Query as UserQueries
 
 
+# Dynamically locate controller modules and import classes based on class name
+@lru_cache(maxsize=None)
+def dynamic_import_classes(class_name) -> list:
+    return [
+        getattr(import_module(module_path), class_name)
+        for module_path in
+        (str(file).replace('/', '.').replace('\\', '.')[:-3] for file in Path('src/app').glob('**/*_controller.py'))
+        if hasattr(import_module(module_path), class_name)
+    ]
+
+
+QueryClasses: list = dynamic_import_classes('Query')
+MutationClasses: list = dynamic_import_classes('Mutation')
+
+
+# Define GraphQL schema using aggregated classes
 @type
-class Query(UserQueries, TownsquareQueries):
+class Query(*QueryClasses):
     pass
 
 
 @type
-class Mutation(UserMutations, AuthMutations, TownsquareMutations):
+class Mutation(*MutationClasses):
     pass
 
 
-schema: Schema = Schema(query=Query, mutation=Mutation, extensions=[QueryDepthLimiter(15)])
+security_extensions = [QueryDepthLimiter(10), MaxAliasesLimiter(10), MaxTokensLimiter(1000)]
+schema: Schema = Schema(query=Query, mutation=Mutation, extensions=security_extensions)
 
-graphql_app: GraphQLRouter = GraphQLRouter(schema=schema, context_getter=get_user_context)
+graphql_app: GraphQLRouter = GraphQLRouter(schema=schema, context_getter=get_user_context, graphql_ide="graphiql")
