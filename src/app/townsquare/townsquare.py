@@ -1,8 +1,9 @@
-from neomodel import AsyncStructuredNode, StringProperty, AsyncRelationshipFrom, UniqueIdProperty
+from neomodel import AsyncStructuredNode, StringProperty, AsyncRelationshipFrom, UniqueIdProperty, DateTimeProperty
 
 
 class Townsquare(AsyncStructuredNode):
     uid = UniqueIdProperty()
+    created_at = DateTimeProperty(default_now=True)
     name = StringProperty(unique_index=True)
     description = StringProperty()
 

@@ -1,8 +1,10 @@
-from neomodel import AsyncStructuredNode, StringProperty, EmailProperty, UniqueIdProperty, AsyncRelationshipFrom, AsyncRelationshipTo
+from neomodel import AsyncStructuredNode, StringProperty, EmailProperty, UniqueIdProperty, AsyncRelationshipFrom, \
+    AsyncRelationshipTo, DateTimeProperty
 
 
 class User(AsyncStructuredNode):
     uid = UniqueIdProperty()
+    created_at = DateTimeProperty(default_now=True)
     username = StringProperty(required=True, unique_index=True)
     email = EmailProperty(required=True, unique_index=True)
     password = StringProperty(required=True)
