@@ -13,7 +13,7 @@ class AuthIn:
 
 
 @type
-class Mutation:
+class AuthMutations:
     @mutation
     async def login(self, login_credentials: AuthIn) -> str:
         try:
@@ -24,3 +24,10 @@ class Mutation:
             raise Exception("User not found")
         except PermissionError:
             raise Exception("Invalid Credentials")
+
+
+@type
+class Mutation:
+    @mutation
+    def auth(self) -> AuthMutations:
+        return AuthMutations()

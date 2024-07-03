@@ -1,6 +1,8 @@
+from datetime import datetime
 from typing import Annotated, List, TYPE_CHECKING
+from uuid import UUID
 
-from strawberry import type, input, ID, Private, lazy
+from strawberry import type, input, Private, lazy
 
 if TYPE_CHECKING:
     from src.app.townsquare.townsquare_schema import TownsquareType
@@ -13,7 +15,8 @@ if TYPE_CHECKING:
 
 @type
 class UserType:
-    uid: ID
+    uid: UUID
+    created_at: datetime
     username: str
     email: str
     password: Private[str]

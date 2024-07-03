@@ -1,6 +1,8 @@
+from datetime import datetime
 from typing import Annotated, List, TYPE_CHECKING
+from uuid import UUID
 
-from strawberry import type, input, ID, lazy
+from strawberry import type, input, lazy
 
 if TYPE_CHECKING:
     from src.app.user.user_schema import UserType
@@ -9,7 +11,8 @@ if TYPE_CHECKING:
 
 @type
 class TownsquareType:
-    uid: ID
+    uid: UUID
+    created_at: datetime
     name: str
     description: str
     members: List[Annotated["UserType", lazy("src.app.user.user_schema")]]
