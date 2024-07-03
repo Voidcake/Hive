@@ -4,6 +4,7 @@ import os
 from neomodel import config, adb
 from neomodel.exceptions import NeomodelException
 
+from src.app.question.question_repository import QuestionRepository
 from src.app.townsquare.townsquare_repository import TownsquareRepository
 from src.app.user.user_repository import UserRepository
 
@@ -53,12 +54,9 @@ async def _purge_db():
 
 async def _update_constraints():
     try:
-        user_repo = UserRepository()
-        townsquare_repo = TownsquareRepository()
-        await user_repo.add_database_constraints(label="User")
-        await townsquare_repo.add_database_constraints(label="Townsquare")
         await UserRepository().add_database_constraints(label="User")
         await TownsquareRepository().add_database_constraints(label="Townsquare")
+        await QuestionRepository().add_database_constraints(label="Question")
     except Exception as e:
         logging.error(f"Error updating database constraints: {str(e)}")
         raise

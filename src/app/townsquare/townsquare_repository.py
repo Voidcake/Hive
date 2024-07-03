@@ -9,6 +9,7 @@ from src.app.user.user import User
 from src.infra.db.crud_repository_interface import ICRUDRepository
 from src.infra.db.db_types import GraphDataTypes as types
 from src.infra.db.graph_repository_interface import IGraphRepository
+from src.app.question.question import Question
 
 
 class TownsquareRepository(ICRUDRepository, IGraphRepository):
@@ -69,6 +70,16 @@ class TownsquareRepository(ICRUDRepository, IGraphRepository):
         except Exception as e:
             logging.error(f"Error getting all members of Townsquare with ID '{townsquare_id}': {str(e)}")
             raise e
+
+    # Questions
+    async def get_all_questions(self, townsquare_id: str) -> List[Question]:
+        try:
+            townsquare: Townsquare = await self.get(townsquare_id)
+            return await townsquare.questions.all()
+        except Exception as e:
+            logging.error(f"Error getting all questions of Townsquare with ID '{townsquare_id}': {str(e)}")
+            raise e
+
 
     # Graph Constraints
 

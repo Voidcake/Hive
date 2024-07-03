@@ -7,6 +7,6 @@ class User(AsyncStructuredNode):
     email = EmailProperty(required=True, unique_index=True)
     password = StringProperty(required=True)
     first_name = StringProperty(required=True)
+
     townsquare_memberships = AsyncRelationshipTo('src.app.townsquare.townsquare.Townsquare', 'MEMBER_OF')
-
-
+    questions = AsyncRelationshipFrom('src.app.question.question.Question', 'ASKED_BY')

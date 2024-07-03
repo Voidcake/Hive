@@ -4,6 +4,8 @@ from strawberry import type, input, ID, lazy
 
 if TYPE_CHECKING:
     from src.app.user.user_schema import UserType
+    from src.app.question.question_schema import QuestionType
+
 
 @type
 class TownsquareType:
@@ -11,6 +13,7 @@ class TownsquareType:
     name: str
     description: str
     members: List[Annotated["UserType", lazy("src.app.user.user_schema")]]
+    questions: List[Annotated["QuestionType", lazy("src.app.question.question_schema")]]
 
 
 @input

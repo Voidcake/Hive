@@ -1,5 +1,6 @@
 from typing import List
 
+from src.app.question.question import Question
 from src.app.townsquare.townsquare import Townsquare
 from src.app.townsquare.townsquare_repository import TownsquareRepository
 from src.app.user.user import User
@@ -38,6 +39,9 @@ class TownsquareService:
 
     async def get_all_members(self, townsquare_id: str) -> List[User]:
         return await self.townsquare_repository.get_all_members(townsquare_id)
+
+    async def get_all_questions(self, townsquare_id: str) -> List[Question]:
+        return await self.townsquare_repository.get_all_questions(townsquare_id)
 
 
 def get_townsquare_service() -> TownsquareService:

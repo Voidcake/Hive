@@ -3,8 +3,8 @@ from typing import Annotated, List, TYPE_CHECKING
 from strawberry import type, input, ID, Private, lazy
 
 if TYPE_CHECKING:
-    from src.app.townsquare.townsquare_schema import TownsquareType, TownsquareIn
     from src.app.townsquare.townsquare_schema import TownsquareType
+    from src.app.question.question_schema import QuestionType
 
 
 # INFO
@@ -18,9 +18,9 @@ class UserType:
     email: str
     password: Private[str]
     first_name: str | None = None
-    townsquare_memberships: List[Annotated["TownsquareType", lazy("src.app.townsquare.townsquare_schema")]] | None = None
     townsquare_memberships: List[
                                 Annotated["TownsquareType", lazy("src.app.townsquare.townsquare_schema")]] | None = None
+    questions: List[Annotated["QuestionType", lazy("src.app.question.question_schema")]] | None = None
 
 
 @input

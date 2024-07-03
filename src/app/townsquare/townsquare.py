@@ -7,3 +7,4 @@ class Townsquare(AsyncStructuredNode):
     description = StringProperty()
 
     members = AsyncRelationshipFrom('src.app.user.user.User', 'MEMBER_OF')
+    questions = AsyncRelationshipFrom('src.app.question.question.Question', 'ASKED_IN')
