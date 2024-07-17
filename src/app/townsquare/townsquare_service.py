@@ -1,6 +1,6 @@
+from datetime import datetime
 from typing import List
 
-from src.app.question.question import Question
 from src.app.townsquare.townsquare import Townsquare
 from src.app.townsquare.townsquare_repository import TownsquareRepository
 from src.app.user.user import User
@@ -18,14 +18,14 @@ class TownsquareService:
         if not description:
             description = f"Welcome to {name}!"
 
-        new_townsquare: Townsquare = Townsquare(name=name, description=description)
+        new_townsquare: Townsquare = Townsquare(created_at=datetime.now(), name=name, description=description)
         new_townsquare = await self.townsquare_repository.create(new_townsquare)
 
         await self.user_service.join_townsquare(user_id=creator_id, townsquare_id=new_townsquare.uid)
 
         return new_townsquare
 
-    async def get_townsquare_via_id(self, townsquare_id: str) -> Townsquare:
+    async def get_townsquare(self, townsquare_id: str) -> Townsquare:
         return await self.townsquare_repository.get(townsquare_id)
 
     async def get_all_townsquares(self) -> List[Townsquare]:
@@ -39,9 +39,6 @@ class TownsquareService:
 
     async def get_all_members(self, townsquare_id: str) -> List[User]:
         return await self.townsquare_repository.get_all_members(townsquare_id)
-
-    async def get_all_questions(self, townsquare_id: str) -> List[Question]:
-        return await self.townsquare_repository.get_all_questions(townsquare_id)
 
 
 def get_townsquare_service() -> TownsquareService:

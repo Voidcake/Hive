@@ -1,11 +1,11 @@
-from neomodel import AsyncStructuredNode, StringProperty, AsyncRelationshipFrom, UniqueIdProperty, DateTimeProperty
+from neomodel import StringProperty, AsyncRelationshipFrom
+
+from src.app.BaseNode import BaseNode
 
 
-class Townsquare(AsyncStructuredNode):
-    uid = UniqueIdProperty()
-    created_at = DateTimeProperty(default_now=True)
+class Townsquare(BaseNode):
     name = StringProperty(unique_index=True)
     description = StringProperty()
 
     members = AsyncRelationshipFrom('src.app.user.user.User', 'MEMBER_OF')
-    questions = AsyncRelationshipFrom('src.app.question.question.Question', 'ASKED_IN')
+    questions = AsyncRelationshipFrom('src.app.arg_framework.question.question.Question', 'ASKED_IN')

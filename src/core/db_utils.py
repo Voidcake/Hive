@@ -4,7 +4,7 @@ import os
 from neomodel import config, adb
 from neomodel.exceptions import NeomodelException
 
-from src.app.question.question_repository import QuestionRepository
+from src.app.arg_framework.question.question_repository import QuestionRepository
 from src.app.townsquare.townsquare_repository import TownsquareRepository
 from src.app.user.user_repository import UserRepository
 

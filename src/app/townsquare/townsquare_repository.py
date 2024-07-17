@@ -5,11 +5,9 @@ from neomodel import adb
 from neomodel.exceptions import UniqueProperty, DoesNotExist
 
 from src.app.townsquare.townsquare import Townsquare
-from src.app.user.user import User
 from src.infra.db.crud_repository_interface import ICRUDRepository
 from src.infra.db.db_types import GraphDataTypes as types
 from src.infra.db.graph_repository_interface import IGraphRepository
-from src.app.question.question import Question
 
 
 class TownsquareRepository(ICRUDRepository, IGraphRepository):
@@ -21,7 +19,7 @@ class TownsquareRepository(ICRUDRepository, IGraphRepository):
                 raise ValueError(f"Townsquare '{new_townsquare.name}' already exists")
 
     async def get(self, townsquare_id: str) -> Townsquare:
-        townsquare: Townsquare = await Townsquare.nodes.get_or_none(uid=townsquare_id)
+        townsquare: Townsquare | None = await Townsquare.nodes.get_or_none(uid=townsquare_id)
         if not townsquare:
             raise LookupError(f"The Townsquare with ID '{townsquare_id}' not found in the Database")
         return townsquare
@@ -62,33 +60,13 @@ class TownsquareRepository(ICRUDRepository, IGraphRepository):
             logging.error(f"Error deleting Townsquare with ID '{townsquare_id}': {str(e)}")
             raise e
 
-    # Members
-    async def get_all_members(self, townsquare_id: str) -> List[User]:
-        try:
-            townsquare: Townsquare = await self.get(townsquare_id)
-            return await townsquare.members.all()
-        except Exception as e:
-            logging.error(f"Error getting all members of Townsquare with ID '{townsquare_id}': {str(e)}")
-            raise e
-
-    # Questions
-    async def get_all_questions(self, townsquare_id: str) -> List[Question]:
-        try:
-            townsquare: Townsquare = await self.get(townsquare_id)
-            return await townsquare.questions.all()
-        except Exception as e:
-            logging.error(f"Error getting all questions of Townsquare with ID '{townsquare_id}': {str(e)}")
-            raise e
-
-
     # Graph Constraints
-
     async def add_database_constraints(self, label: str, constraints=None):
         constraints: dict = {
             "node": {
-                "uid":         ("unique", "required", types.STRING),
-                "name":        ("unique", "required", types.STRING),
-                #"description": ("", "", types.STRING),
+                "uid":  ("unique", "required", types.STRING),
+                "name": ("unique", "required", types.STRING),
+                # "description": ("", "", types.STRING),
             }
         }
         await super().add_database_constraints(label, constraints)

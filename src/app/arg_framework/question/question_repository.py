@@ -1,10 +1,12 @@
 import logging
 from typing import List
+from uuid import UUID
 
 from neomodel import adb
 from neomodel.exceptions import UniqueProperty, DoesNotExist
 
-from src.app.question.question import Question
+from src.app.arg_framework.AddressableNode import AddressableNode
+from src.app.arg_framework.question.question import Question
 from src.app.townsquare.townsquare import Townsquare
 from src.app.user.user import User
 from src.infra.db.crud_repository_interface import ICRUDRepository
@@ -22,7 +24,7 @@ class QuestionRepository(IGraphRepository, ICRUDRepository):
                 return new_question
 
             except UniqueProperty:
-                raise ValueError(f"Question '{new_question.title}' already exists")
+                raise ValueError(f"Question '{new_question.question}' already exists")
 
     async def get(self, question_id: str) -> Question:
         question: Question = await Question.nodes.get_or_none(uid=question_id)

@@ -23,14 +23,14 @@ class UserRepository(ICRUDRepository, IGraphRepository):
 
     @staticmethod
     async def get(user_id: str) -> User:
-        user: User = await User.nodes.get_or_none(uid=user_id)
+        user: User | None = await User.nodes.get_or_none(uid=user_id)
         if not user:
             raise LookupError(f"The User with ID '{user_id}' not found in the Database")
         return user
 
     @staticmethod
     async def get_via_username(username: str) -> User:
-        user: User = await User.nodes.get_or_none(username=username)
+        user: User | None = await User.nodes.get_or_none(username=username)
         if not user:
             raise LookupError(f"The User with username '{username}' not found in the Database")
         return user
@@ -78,18 +78,10 @@ class UserRepository(ICRUDRepository, IGraphRepository):
             raise e
 
     # Townsquare Memberships
-    async def get_all_townsquare_memberships(self, user_id: str) -> List[Townsquare]:
-        try:
-            user: User = await self.get(user_id)
-            return await user.communities.all()
-        except Exception as e:
-            logging.error(f"Error getting all Townsquare Memberships of User with ID '{user_id}': {str(e)}")
-            raise e
-
     async def join_townsquare(self, user_id: str, townsquare_id: str) -> User:
         try:
             user: User = await self.get(user_id)
-            townsquare: Townsquare = await Townsquare.nodes.get_or_none(uid=townsquare_id)
+            townsquare: Townsquare | None = await Townsquare.nodes.get_or_none(uid=townsquare_id)
 
             if not townsquare:
                 raise LookupError(f"The Townsquare with ID '{townsquare_id}' not found in the Database")
@@ -108,9 +100,11 @@ class UserRepository(ICRUDRepository, IGraphRepository):
     async def leave_townsquare(self, user_id: str, townsquare_id: str) -> User:
         try:
             user: User = await self.get(user_id)
-            townsquare: Townsquare = await Townsquare.nodes.get_or_none(uid=townsquare_id)
+
+            townsquare: Townsquare | None = await Townsquare.nodes.get_or_none(uid=townsquare_id)
             if not townsquare:
                 raise LookupError(f"The Townsquare with ID '{townsquare_id}' not found in the Database")
+
             async with adb.transaction:
                 await user.townsquare_memberships.disconnect(townsquare)
                 return await user.save()
@@ -122,15 +116,14 @@ class UserRepository(ICRUDRepository, IGraphRepository):
             raise e
 
     # Graph Constraints
-
     async def add_database_constraints(self, label: str, constraints=None):
         constraints: dict = {
             "node": {
-                "uid":             ("unique", "required", types.STRING),
-                "username":        ("unique", "required", types.STRING),
-                "email":           ("unique", "required", types.STRING),
-                "password":        ("required", types.STRING),
-                "first_name":      ("required", types.STRING)
+                "uid":        ("unique", "required", types.STRING),
+                "username":   ("unique", "required", types.STRING),
+                "email":      ("unique", "required", types.STRING),
+                "password":   ("required", types.STRING),
+                "first_name": ("required", types.STRING)
             }
         }
         await super().add_database_constraints(label, constraints)

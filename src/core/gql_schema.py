@@ -1,7 +1,6 @@
+from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
-from functools import lru_cache
-
 
 from strawberry import type, Schema
 from strawberry.extensions import QueryDepthLimiter, MaxAliasesLimiter, MaxTokensLimiter
@@ -21,18 +20,14 @@ def dynamic_import_classes(class_name) -> list:
     ]
 
 
-QueryClasses: list = dynamic_import_classes('Query')
-MutationClasses: list = dynamic_import_classes('Mutation')
-
-
 # Define GraphQL schema using aggregated classes
 @type
-class Query(*QueryClasses):
+class Query(*(dynamic_import_classes('Query'))):
     pass
 
 
 @type
-class Mutation(*MutationClasses):
+class Mutation(*(dynamic_import_classes('Mutation'))):
     pass
 
 

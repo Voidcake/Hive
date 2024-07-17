@@ -1,14 +1,15 @@
-from neomodel import AsyncStructuredNode, StringProperty, EmailProperty, UniqueIdProperty, AsyncRelationshipFrom, \
-    AsyncRelationshipTo, DateTimeProperty
+from neomodel import StringProperty, EmailProperty, AsyncRelationshipFrom, \
+    AsyncRelationshipTo
+
+from src.app.BaseNode import BaseNode
 
 
-class User(AsyncStructuredNode):
-    uid = UniqueIdProperty()
-    created_at = DateTimeProperty(default_now=True)
+class User(BaseNode):
     username = StringProperty(required=True, unique_index=True)
-    email = EmailProperty(required=True, unique_index=True)
+    email = EmailProperty(required=True)
     password = StringProperty(required=True)
     first_name = StringProperty(required=True)
 
     townsquare_memberships = AsyncRelationshipTo('src.app.townsquare.townsquare.Townsquare', 'MEMBER_OF')
-    questions = AsyncRelationshipFrom('src.app.question.question.Question', 'ASKED_BY')
+    questions = AsyncRelationshipFrom('src.app.arg_framework.question.question.Question', 'ASKED_BY')
+    claims = AsyncRelationshipFrom('src.app.arg_framework.claim.claim.Claim', 'AUTHORED_BY')
