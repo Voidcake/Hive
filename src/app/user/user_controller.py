@@ -1,4 +1,5 @@
 from typing import List
+from uuid import UUID
 
 from strawberry import type, mutation, Info, field
 
@@ -17,7 +18,7 @@ class UserQueries:
         return [UserType.from_node(user_node) for user_node in user_nodes]
 
     @field
-    async def user_by_id(self, user_id: str) -> UserType:
+    async def user_by_id(self, user_id: UUID) -> UserType:
         user_node: User = await user_service.get_user_via_id(user_id)
         return UserType.from_node(user_node)
 
@@ -37,7 +38,7 @@ class UserMutations:
 
     @mutation
     async def update_current_user(self, info: Info, updated_user: UserUpdateIn) -> UserType:
-        uid: str = await info.context.uid()
+        uid: UUID = await info.context.uid()
         user = await user_service.update_user(user_id=uid, **vars(updated_user))
         return UserType.from_node(user)
 
@@ -45,20 +46,21 @@ class UserMutations:
     async def delete_current_user(self, info: Info, confirmation: bool = False) -> str:
         if not confirmation:
             return "Deletion not confirmed"
-        uid: str = await info.context.uid()
+        uid: UUID = await info.context.uid()
         return await user_service.delete_user(user_id=uid)
 
     @mutation
-    async def join_townsquare(self, info: Info, townsquare_id: str) -> UserType:
-        uid: str = await info.context.uid()
+    async def join_townsquare(self, info: Info, townsquare_id: UUID) -> UserType:
+        uid: UUID = await info.context.uid()
         user = await user_service.join_townsquare(user_id=uid, townsquare_id=townsquare_id)
         return UserType.from_node(user)
 
     @mutation
-    async def leave_townsquare(self, info: Info, townsquare_id: str) -> UserType:
-        uid: str = await info.context.uid()
+    async def leave_townsquare(self, info: Info, townsquare_id: UUID) -> UserType:
+        uid: UUID = await info.context.uid()
         user = await user_service.leave_townsquare(user_id=uid, townsquare_id=townsquare_id)
         return UserType.from_node(user)
+
 
 @type
 class Query:

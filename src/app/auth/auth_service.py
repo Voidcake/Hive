@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
+from uuid import UUID
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -37,14 +37,14 @@ class AuthenticationService:
         except JWTError as e:
             raise PermissionError("Failed to create access Token") from e
 
-    def decode_access_token(self, token: str) -> str:
+    def decode_access_token(self, token: str) -> UUID:
         """Decode the access token and return the user UUID from (sub)"""
         try:
             payload = jwt.decode(token=token, key=self.__secret_key, algorithms=[self.__algorithm])
             uid: str = payload.get("sub")
             if uid is None:
                 raise PermissionError("Invalid token data")
-            return uid
+            return UUID(uid)
 
         except JWTError as e:
             raise PermissionError("Could not validate credentials") from e
@@ -61,7 +61,7 @@ class AuthenticationService:
 
     async def get_current_user(self, token: str = Depends(oauth2_scheme)) -> User:
         try:
-            uid: str = self.decode_access_token(token)
+            uid: UUID = self.decode_access_token(token)
             return await get_user_service().get_user_via_id(uid)
         except Exception as e:
             raise e

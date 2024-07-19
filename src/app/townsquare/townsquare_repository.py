@@ -1,5 +1,6 @@
 import logging
 from typing import List
+from uuid import UUID
 
 from neomodel import adb
 from neomodel.exceptions import UniqueProperty, DoesNotExist
@@ -18,8 +19,8 @@ class TownsquareRepository(ICRUDRepository, IGraphRepository):
             except UniqueProperty:
                 raise ValueError(f"Townsquare '{new_townsquare.name}' already exists")
 
-    async def get(self, townsquare_id: str) -> Townsquare:
-        townsquare: Townsquare | None = await Townsquare.nodes.get_or_none(uid=townsquare_id)
+    async def get(self, townsquare_id: UUID) -> Townsquare:
+        townsquare: Townsquare | None = await Townsquare.nodes.get_or_none(uid=townsquare_id.hex)
         if not townsquare:
             raise LookupError(f"The Townsquare with ID '{townsquare_id}' not found in the Database")
         return townsquare
@@ -27,7 +28,7 @@ class TownsquareRepository(ICRUDRepository, IGraphRepository):
     async def get_all(self) -> List[Townsquare]:
         return await Townsquare.nodes.all()
 
-    async def update(self, townsquare_id: str, **kwargs) -> Townsquare:
+    async def update(self, townsquare_id: UUID, **kwargs) -> Townsquare:
         try:
             townsquare: Townsquare = await self.get(townsquare_id)
             for key, value in kwargs.items():
@@ -47,7 +48,7 @@ class TownsquareRepository(ICRUDRepository, IGraphRepository):
             logging.error(f"Error updating Townsquare with ID '{townsquare_id}': {str(e)}")
             raise e
 
-    async def delete(self, townsquare_id: str) -> str:
+    async def delete(self, townsquare_id: UUID) -> str:
         try:
             townsquare: Townsquare = await self.get(townsquare_id)
             async with adb.transaction:

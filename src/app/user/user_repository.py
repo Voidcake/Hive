@@ -1,5 +1,6 @@
 import logging
 from typing import List
+from uuid import UUID
 
 from neomodel import adb
 from neomodel.exceptions import UniqueProperty, DoesNotExist
@@ -22,8 +23,8 @@ class UserRepository(ICRUDRepository, IGraphRepository):
                 raise ValueError(f"Username '{new_user.username}' or Email '{new_user.email}' already exists")
 
     @staticmethod
-    async def get(user_id: str) -> User:
-        user: User | None = await User.nodes.get_or_none(uid=user_id)
+    async def get(user_id: UUID) -> User:
+        user: User | None = await User.nodes.get_or_none(uid=user_id.hex)
         if not user:
             raise LookupError(f"The User with ID '{user_id}' not found in the Database")
         return user
@@ -39,7 +40,7 @@ class UserRepository(ICRUDRepository, IGraphRepository):
     async def get_all() -> List[User]:
         return await User.nodes.all()
 
-    async def update(self, user_id: str, **kwargs) -> User:
+    async def update(self, user_id: UUID, **kwargs) -> User:
         try:
             user: User = await self.get(user_id)
             for key, value in kwargs.items():
@@ -62,7 +63,7 @@ class UserRepository(ICRUDRepository, IGraphRepository):
             logging.error(f"Error updating User with ID '{user_id}': {str(e)}")
             raise e
 
-    async def delete(self, user_id: str) -> str:
+    async def delete(self, user_id: UUID) -> str:
         try:
             user: User = await self.get(user_id)
             async with adb.transaction:
@@ -78,7 +79,7 @@ class UserRepository(ICRUDRepository, IGraphRepository):
             raise e
 
     # Townsquare Memberships
-    async def join_townsquare(self, user_id: str, townsquare_id: str) -> User:
+    async def join_townsquare(self, user_id: UUID, townsquare_id: UUID) -> User:
         try:
             user: User = await self.get(user_id)
             townsquare: Townsquare | None = await Townsquare.nodes.get_or_none(uid=townsquare_id)
@@ -97,7 +98,7 @@ class UserRepository(ICRUDRepository, IGraphRepository):
             logging.error(f"Error joining User with ID '{user_id}' to Townsquare: {str(e)}")
             raise e
 
-    async def leave_townsquare(self, user_id: str, townsquare_id: str) -> User:
+    async def leave_townsquare(self, user_id: UUID, townsquare_id: UUID) -> User:
         try:
             user: User = await self.get(user_id)
 

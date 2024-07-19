@@ -40,10 +40,10 @@ class QuestionService(IOwnable):
             raise PermissionError("You are not the author of this question")
         return True
 
-    async def update_question(self, question_id: str, **kwargs) -> Question:
+    async def update_question(self, question_id: UUID, **kwargs) -> Question:
         return await self.question_repository.update(question_id, **kwargs)
 
-    async def delete_question(self, question_id: str) -> str:
+    async def delete_question(self, question_id: UUID) -> str:
         return await self.question_repository.delete(question_id)
 
     async def get_all_claims(self, question_id: str):  # -> List[Claim]:

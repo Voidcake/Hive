@@ -4,7 +4,7 @@ from src.app.BaseNode import BaseNode
 
 
 class Question(BaseNode):  # , AddressableNode):
-    question = StringProperty(required=True)
+    question = StringProperty(required=True, unique_index=True)
     description = StringProperty()
 
     # Relationships

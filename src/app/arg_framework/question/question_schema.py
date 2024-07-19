@@ -51,7 +51,7 @@ class QuestionType:
 class QuestionIn:
     question: str
     description: str | None = None
-    townsquare_id: str
+    townsquare_id: UUID
     addressed_node_id: UUID | None = None  # TODO: implement
 
 

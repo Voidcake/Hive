@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List
+from uuid import UUID
 
 from passlib.context import CryptContext
 
@@ -23,7 +24,7 @@ class UserService:
             new_user.first_name = first_name.capitalize()
         return await self.user_repository.create(new_user)
 
-    async def get_user_via_id(self, user_id: str) -> User:
+    async def get_user_via_id(self, user_id: UUID) -> User:
         return await self.user_repository.get(user_id)
 
     async def get_user_via_username(self, username: str) -> User:
@@ -32,16 +33,16 @@ class UserService:
     async def get_all_users(self) -> List[User]:
         return await self.user_repository.get_all()
 
-    async def update_user(self, user_id: str, **kwargs) -> User:
+    async def update_user(self, user_id: UUID, **kwargs) -> User:
         return await self.user_repository.update(user_id, **kwargs)
 
-    async def delete_user(self, user_id: str) -> str:
+    async def delete_user(self, user_id: UUID) -> str:
         return await self.user_repository.delete(user_id)
 
-    async def join_townsquare(self, user_id: str, townsquare_id: str) -> User:
+    async def join_townsquare(self, user_id: UUID, townsquare_id: UUID) -> User:
         return await self.user_repository.join_townsquare(user_id, townsquare_id)
 
-    async def leave_townsquare(self, user_id: str, townsquare_id: str) -> User:
+    async def leave_townsquare(self, user_id: UUID, townsquare_id: UUID) -> User:
         return await self.user_repository.leave_townsquare(user_id, townsquare_id)
 
 

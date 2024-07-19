@@ -35,7 +35,7 @@ class QuestionRepository(IGraphRepository, ICRUDRepository):
     async def get_all(self) -> List[Question]:
         return await Question.nodes.all()
 
-    async def update(self, question_id: str, **kwargs) -> Question:
+    async def update(self, question_id: UUID, **kwargs) -> Question:
         try:
             question: Question = await self.get(question_id)
             for key, value in kwargs.items():
@@ -55,7 +55,7 @@ class QuestionRepository(IGraphRepository, ICRUDRepository):
             logging.error(f"Error updating Question with ID '{question_id}': {str(e)}")
             raise e
 
-    async def delete(self, question_id: str) -> str:
+    async def delete(self, question_id: UUID) -> str:
         try:
             question: Question = await self.get(question_id)
             async with adb.transaction:
@@ -70,7 +70,7 @@ class QuestionRepository(IGraphRepository, ICRUDRepository):
 
     async def add_database_constraints(self, label: str, constraints: dict = None):
         constraints: dict = {
-            'Node': {
+            'node': {
                 'uid':         ("unique", "required", types.STRING),
                 'title':       ("unique", "required", types.STRING),
                 'description': ("unique", types.STRING)
