@@ -1,7 +1,8 @@
 import logging
 from abc import ABC, abstractmethod
+from uuid import UUID
 
-from neomodel import adb
+from neomodel import adb, AsyncStructuredNode
 
 from infra.db.db_types import GraphDataTypes
 
@@ -112,3 +113,22 @@ class IGraphRepository(ABC):
                 property_constraints]
             formatted_constraints.append(f"{property_name}: {formatted_property_constraints}")
         return "\n ".join(formatted_constraints)
+
+    @staticmethod
+    async def query_nodes(node_id: UUID, limit: int = 1) -> AsyncStructuredNode:
+        """
+        Query the graph database for a node with a given ID
+
+        :param node_id:
+        :param limit: the maximum number of nodes to return
+        :raises LookupError
+        :return: AsyncStructuredNode
+        """
+        query = "MATCH (n) WHERE n.uid = $uid RETURN n LIMIT $limit"
+        results, meta = await adb.cypher_query(query, {"uid": node_id.hex, "limit": limit}, resolve_objects=True)
+        target_node: AsyncStructuredNode | None = results[0][0] if results else None
+
+        if not target_node:
+            raise LookupError(f"Node with ID '{node_id}' not found in the Database")
+
+        return target_node
