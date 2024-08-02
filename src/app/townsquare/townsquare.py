@@ -1,6 +1,6 @@
 from neomodel import StringProperty, AsyncRelationshipFrom
 
-from src.app.BaseNode import BaseNode
+from src.app.base_node import BaseNode
 
 
 class Townsquare(BaseNode):

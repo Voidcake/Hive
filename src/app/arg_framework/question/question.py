@@ -1,9 +1,9 @@
-from neomodel import StringProperty, AsyncRelationshipTo, AsyncOne
+from neomodel import StringProperty, AsyncRelationshipTo, AsyncOne, AsyncRelationshipFrom
 
-from src.app.BaseNode import BaseNode
+from src.app.base_node import BaseNode
 
 
-class Question(BaseNode):  # , AddressableNode):
+class Question(BaseNode):
     question = StringProperty(required=True, unique_index=True)
     description = StringProperty()
 

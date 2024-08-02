@@ -2,29 +2,26 @@ from typing import List, TYPE_CHECKING, Annotated
 
 from strawberry import type, input, Private, field, lazy
 
-from src.app.BaseNode import BaseNodeType
 from src.app.arg_framework.claim.claim import Claim
 from src.app.arg_framework.question.question import Question
+from src.app.base_node import BaseNodeType, MetaType
 from src.app.townsquare.townsquare import Townsquare
 from src.app.user.user import User
 
 if TYPE_CHECKING:
     from src.app.townsquare.townsquare_schema import TownsquareType
     from src.app.question.question_schema import QuestionType
+    from src.app.arg_framework.claim.claim_schema import ClaimType
 
 
-# INFO
-# Circular dependencies -> author: Annotated["User", strawberry.lazy(".users")]
-
-
-@type
+@type(name="User")
 class UserType(BaseNodeType):
+    node_instance: Private[User]
+
     username: str
     email: str
     password: Private[str]
     first_name: str | None = None
-
-    node_instance: Private[User]
 
     @field
     async def townsquare_memberships(self) -> List[Annotated[
@@ -51,18 +48,18 @@ class UserType(BaseNodeType):
 
     @classmethod
     def from_node(cls, node: User) -> "UserType":
-        return cls(
-            uid=node.uid,
-            created_at=node.created_at,
+        return UserType(
+            node_instance=node,
+
+            meta=MetaType(uid=node.uid, created_at=node.created_at),
             username=node.username,
             email=node.email,
             password=node.password,
             first_name=node.first_name,
-            node_instance=node
         )
 
 
-@input
+@input(name="NewUser")
 class UserIn:
     username: str
     email: str

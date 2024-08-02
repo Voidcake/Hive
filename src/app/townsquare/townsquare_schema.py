@@ -1,22 +1,21 @@
 from typing import List, TYPE_CHECKING, Annotated
 
-from strawberry import type, input, field, Private, lazy
+from strawberry import type, input, Private, lazy, field
 
-from src.app.BaseNode import BaseNodeType
+from src.app.base_node import BaseNodeType, MetaType
 from src.app.townsquare.townsquare import Townsquare
-from src.app.user.user import User
 
 if TYPE_CHECKING:
     from src.app.user.user_schema import UserType
     from src.app.arg_framework.question.question_schema import QuestionType
 
 
-@type
+@type(name="Townsquare")
 class TownsquareType(BaseNodeType):
+    node_instance: Private[Townsquare]
+
     name: str
     description: str
-
-    node_instance: Private[Townsquare]
 
     @field
     async def members(self) -> List[Annotated["UserType", lazy("src.app.user.user_schema")]]:
@@ -35,16 +34,16 @@ class TownsquareType(BaseNodeType):
 
     @classmethod
     def from_node(cls, node: Townsquare) -> "TownsquareType":
-        return cls(
-            uid=node.uid,
-            created_at=node.created_at,
+        return TownsquareType(
+            node_instance=node,
+
+            meta=MetaType(uid=node.uid, created_at=node.created_at),
             name=node.name,
             description=node.description,
-            node_instance=node
         )
 
 
-@input
+@input(name="NewTownsquare")
 class TownsquareIn:
     name: str
     description: str | None = None

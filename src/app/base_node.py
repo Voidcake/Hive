@@ -2,7 +2,7 @@ from datetime import datetime
 from uuid import UUID
 
 from neomodel import AsyncStructuredNode, UniqueIdProperty, DateTimeProperty
-from strawberry import interface
+from strawberry import interface, type
 
 
 class BaseNode(AsyncStructuredNode):
@@ -12,7 +12,12 @@ class BaseNode(AsyncStructuredNode):
     created_at = DateTimeProperty()
 
 
-@interface
-class BaseNodeType:
+@type(name="Metadata")
+class MetaType:
     uid: UUID
     created_at: datetime
+
+
+@interface(name="BaseNode")
+class BaseNodeType:
+    meta: MetaType

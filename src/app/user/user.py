@@ -1,7 +1,7 @@
 from neomodel import StringProperty, EmailProperty, AsyncRelationshipFrom, \
     AsyncRelationshipTo
 
-from src.app.BaseNode import BaseNode
+from src.app.base_node import BaseNode
 
 
 class User(BaseNode):
