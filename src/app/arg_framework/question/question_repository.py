@@ -5,7 +5,6 @@ from uuid import UUID
 from neomodel import adb
 from neomodel.exceptions import UniqueProperty, DoesNotExist
 
-from src.app.arg_framework.AddressableNode import AddressableNode
 from src.app.arg_framework.question.question import Question
 from src.app.townsquare.townsquare import Townsquare
 from src.app.user.user import User
@@ -15,19 +14,21 @@ from src.infra.db.graph_repository_interface import IGraphRepository
 
 
 class QuestionRepository(IGraphRepository, ICRUDRepository):
-    async def create(self, new_question: Question, author: User, townsquare: Townsquare) -> Question:
-        async with adb.transaction:
-            try:
-                await new_question.save()
-                await new_question.author.connect(author)
+    async def create(self, new_question: Question, author: User, townsquare: Townsquare | None) -> Question:
+        try:
+            await new_question.save()
+            await new_question.author.connect(author)
+
+            if townsquare:
                 await new_question.townsquare.connect(townsquare)
-                return new_question
 
-            except UniqueProperty:
-                raise ValueError(f"Question '{new_question.question}' already exists")
+            return new_question
 
-    async def get(self, question_id: str) -> Question:
-        question: Question = await Question.nodes.get_or_none(uid=question_id)
+        except UniqueProperty:
+            raise ValueError(f"Question '{new_question.question}' already exists")
+
+    async def get(self, question_id: UUID) -> Question:
+        question: Question | None = await Question.nodes.get_or_none(uid=question_id)
         if not question:
             raise LookupError(f"The Question with ID '{question_id}' not found in the Database")
         return question
@@ -72,12 +73,12 @@ class QuestionRepository(IGraphRepository, ICRUDRepository):
         constraints: dict = {
             'node': {
                 'uid':         ("unique", "required", types.STRING),
-                'title':       ("unique", "required", types.STRING),
+                'question': ("unique", "required", types.STRING),
                 'description': ("unique", types.STRING)
             }
         }
         await super().add_database_constraints(label, constraints)
 
-    @staticmethod
-    def get_repository():
-        return QuestionRepository()
+
+def get_question_repository():
+    return QuestionRepository()

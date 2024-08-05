@@ -3,17 +3,13 @@ from uuid import UUID
 
 from neomodel import AsyncStructuredNode
 
-from src.app.arg_framework.address_relationship import AddressRelationship
-
 
 class IAddressable(ABC):
     @abstractmethod
-    async def address_node(self, source_node_id: UUID, target_node_id: UUID,
-                           relationship_type: AddressRelationship) -> AsyncStructuredNode:
+    async def address_node(self, source_node_id: UUID, target_node_id: UUID) -> AsyncStructuredNode:
         """
         :param source_node_id
         :param target_node_id
-        :param relationship_type
         :raises ValueError
         :raises LookupError
         :return: AsyncStructuredNode

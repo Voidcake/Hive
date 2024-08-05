@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Annotated
+from typing import TYPE_CHECKING, Annotated, List
 from uuid import UUID
 
 from strawberry import type, input, lazy, field, Private
@@ -9,6 +9,8 @@ from src.app.base_node import BaseNodeType, MetaType
 if TYPE_CHECKING:
     from src.app.user.user_schema import UserType
     from src.app.townsquare.townsquare_schema import TownsquareType
+    from src.app.arg_framework.claim.claim_schema import ClaimType
+
 
 
 @type
@@ -26,11 +28,18 @@ class QuestionType(BaseNodeType):
         return UserType.from_node(author_node)
 
     @field
-    async def townsquare(self) -> Annotated["TownsquareType", lazy("src.app.townsquare.townsquare_schema")]:
+    async def townsquare(self) -> Annotated["TownsquareType", lazy("src.app.townsquare.townsquare_schema")] | None:
         from src.app.townsquare.townsquare_schema import TownsquareType
 
-        townsquare_node: Townsquare = await self.node_instance.townsquare.single()
-        return TownsquareType.from_node(townsquare_node)
+        townsquare_node = await self.node_instance.townsquare.single()
+        return TownsquareType.from_node(townsquare_node) if townsquare_node else None
+
+    @field
+    async def questions(self) -> List[Annotated["ClaimType", lazy("src.app.arg_framework.claim.claim_schema")]] | None:
+        from src.app.arg_framework.claim.claim_schema import ClaimType
+
+        claim_nodes: List[Claim] | None = await self.node_instance.questions.all()
+        return [ClaimType.from_node(claim_node) for claim_node in claim_nodes] if claim_nodes else None
 
     @classmethod
     def from_node(cls, node: Question) -> "QuestionType":
@@ -47,8 +56,8 @@ class QuestionType(BaseNodeType):
 class QuestionIn:
     question: str
     description: str | None = None
-    townsquare_id: UUID
-    addressed_node_id: UUID | None = None  # TODO: implement
+    townsquare_id: UUID | None = None
+    addressed_node_id: UUID | None = None
 
 
 @input

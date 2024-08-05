@@ -4,6 +4,7 @@ import os
 from neomodel import config, adb
 from neomodel.exceptions import NeomodelException
 
+from src.app.arg_framework.claim.claim_repository import ClaimRepository
 from src.app.arg_framework.question.question_repository import QuestionRepository
 from src.app.townsquare.townsquare_repository import TownsquareRepository
 from src.app.user.user_repository import UserRepository
@@ -57,6 +58,7 @@ async def _update_constraints():
         await UserRepository().add_database_constraints(label="User")
         await TownsquareRepository().add_database_constraints(label="Townsquare")
         await QuestionRepository().add_database_constraints(label="Question")
+        await ClaimRepository().add_database_constraints(label="Claim")
     except Exception as e:
         logging.error(f"Error updating database constraints: {str(e)}")
         raise
