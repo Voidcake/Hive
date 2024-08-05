@@ -43,7 +43,7 @@ class QuestionService(IOwnable, IAddressable):
                 else:
                     new_question: Question = await self.question_repository.create(new_question=new_question,
                                                                                    author=author, townsquare=None)
-                    return await self.address_node(new_question.uid, addressed_node_id)
+                    return await self.address_node(new_question, addressed_node_id)
 
             except LookupError as e:
                 raise ValueError(f"Node not found") from e
@@ -76,8 +76,8 @@ class QuestionService(IOwnable, IAddressable):
     async def delete_question(self, question_id: UUID) -> str:
         return await self.question_repository.delete(question_id)
 
-    async def address_node(self, source_node_id: UUID, target_node_id: UUID) -> Question:
-        question: Question = await self.get_question(source_node_id)
+    async def address_node(self, source_node: Question, target_node_id: UUID) -> Question:
+        question: Question = source_node
         target_node: AsyncStructuredNode = await self.question_repository.query_nodes(target_node_id)
 
         await question.questions.connect(target_node)

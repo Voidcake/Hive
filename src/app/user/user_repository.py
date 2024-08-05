@@ -129,6 +129,6 @@ class UserRepository(ICRUDRepository, IGraphRepository):
         }
         await super().add_database_constraints(label, constraints)
 
-    @staticmethod
-    def get_repository() -> 'UserRepository':
-        return UserRepository()
+
+def get_user_repository() -> UserRepository:
+    return UserRepository()

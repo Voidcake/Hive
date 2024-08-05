@@ -2,8 +2,7 @@ from datetime import datetime
 from typing import List
 from uuid import UUID
 
-from neomodel import AsyncStructuredNode
-from neomodel import adb
+from neomodel import AsyncStructuredNode, adb
 
 from src.app.arg_framework.IAddressable import IAddressable
 from src.app.arg_framework.IOwnable import IOwnable
@@ -28,15 +27,13 @@ class ClaimService(IOwnable, IAddressable):
                 new_claim: Claim = await self.claim_repository.create(new_claim, author)
 
                 for addressed_node_id, relationship_type in relationships.items():
-                    await self.address_node(new_claim.uid, addressed_node_id, relationship_type)
+                    await self.address_node(new_claim, addressed_node_id, relationship_type)
 
                 return new_claim
 
             except LookupError as e:
                 raise ValueError(f"Node not found") from e
             except ValueError as e:
-                raise e
-            except Exception as e:
                 raise e
 
     async def get_claim(self, claim_id: UUID) -> Claim:
@@ -67,22 +64,20 @@ class ClaimService(IOwnable, IAddressable):
             raise PermissionError("You are not the author of this claim")
         return True
 
-    async def address_node(self, source_node_id: UUID, target_node_id: UUID,
+    async def address_node(self, source_node: Claim, target_node_id: UUID,
                            relationship_type: AddressRelationship) -> Claim:
-        claim: Claim = await self.get_claim(source_node_id)
-
         target_node: AsyncStructuredNode = await self.claim_repository.query_nodes(target_node_id)
 
         if relationship_type == AddressRelationship.ATTACKS:
-            await claim.attacks.connect(target_node)
+            await source_node.attacks.connect(target_node)
         elif relationship_type == AddressRelationship.SUPPORTS:
-            await claim.supports.connect(target_node)
+            await source_node.supports.connect(target_node)
         elif relationship_type == AddressRelationship.ANSWERS:
-            await claim.answers.connect(target_node)
+            await source_node.answers.connect(target_node)
         else:
             raise ValueError("Invalid relationship type")
 
-        return claim
+        return source_node
 
     async def disconnect_node(self, source_node_id: UUID, target_node_id: UUID) -> Claim:
         claim: Claim = await self.get_claim(source_node_id)

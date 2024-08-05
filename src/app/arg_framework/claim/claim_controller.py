@@ -44,12 +44,11 @@ class ClaimMutations:
         uid: UUID = await info.context.uid()
 
         if await claim_service.check_ownership(user_id=uid, claim_id=updated_claim.claim_id):
-            claim = await claim_service.update_claim(claim_id=claim_id, **vars(updated_claim))
+            claim = await claim_service.update_claim(**vars(updated_claim))
             return ClaimType.from_node(claim)
 
     @mutation
     async def update_claim_relationships(self, info: Info, updated_claim: ClaimUpdateRelationshipIn) -> ClaimType:
-
         uid: UUID = await info.context.uid()
 
         if await claim_service.check_ownership(user_id=uid, claim_id=updated_claim.claim_id):
