@@ -10,6 +10,7 @@ from src.app.base_node import BaseNodeType, MetaType
 if TYPE_CHECKING:
     from src.app.user.user_schema import UserType
     from src.app.arg_framework.question.question_schema import QuestionType
+    from src.app.arg_framework.premise.premise_schema import PremiseType
 
 
 @type(name="ClaimRelationships")
@@ -27,6 +28,7 @@ class RelationshipsType:
     @field
     async def answers(self) -> List[Annotated["QuestionType", lazy("src.app.arg_framework.question.question_schema")]]:
         from src.app.arg_framework.question.question_schema import QuestionType
+
         return [QuestionType.from_node(question_node) for question_node in await self.node_instance.answers.all()]
 
     @field
@@ -41,6 +43,7 @@ class RelationshipsType:
     async def questioned_by(self) -> List[
         Annotated["QuestionType", lazy("src.app.arg_framework.question.question_schema")]]:
         from src.app.arg_framework.question.question_schema import QuestionType
+
         return [QuestionType.from_node(question_node) for question_node in await self.node_instance.questioned_by.all()]
 
 
@@ -55,6 +58,12 @@ class ClaimType(BaseNodeType):
         from src.app.user.user_schema import UserType
 
         return UserType.from_node(await self.node_instance.author.single())
+
+    @field
+    async def premises(self) -> List[Annotated["PremiseType", lazy("src.app.arg_framework.premise.premise_schema")]]:
+        from src.app.arg_framework.premise.premise_schema import PremiseType
+
+        return [PremiseType.from_node(premise_node) for premise_node in await self.node_instance.premises.all()]
 
     @field
     async def relationships(self) -> RelationshipsType:

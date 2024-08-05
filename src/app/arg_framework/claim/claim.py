@@ -15,5 +15,6 @@ class Claim(BaseNode):
     supported_by = AsyncRelationshipFrom('src.app.arg_framework.claim.claim.Claim', 'SUPPORTED_BY')
     questioned_by = AsyncRelationshipFrom('src.app.arg_framework.question.question.Question', 'QUESTIONS')
 
-    # TODO: premises
+    premises = AsyncRelationshipTo('src.app.arg_framework.premise.premise.Premise', 'HAS_PREMISE')
+
     # TODO: evidence = AsyncRelationshipFrom('app.evidence.evidence.Evidence', 'SUPPORTS', model='evidence')
