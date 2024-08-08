@@ -5,10 +5,11 @@ from neomodel import config, adb
 from neomodel.exceptions import NeomodelException
 
 from src.app.arg_framework.claim.claim_repository import ClaimRepository
+from src.app.arg_framework.evidence.evidence_repository import EvidenceRepository
+from src.app.arg_framework.premise.premise_repository import PremiseRepository
 from src.app.arg_framework.question.question_repository import QuestionRepository
 from src.app.townsquare.townsquare_repository import TownsquareRepository
 from src.app.user.user_repository import UserRepository
-from src.app.arg_framework.premise.premise_repository import PremiseRepository
 
 
 async def setup_db(database_name: str = "neo4j", test_connection: bool = False, purge_db: bool = False,
@@ -61,6 +62,7 @@ async def _update_constraints():
         await QuestionRepository().add_database_constraints(label="Question")
         await ClaimRepository().add_database_constraints(label="Claim")
         await PremiseRepository().add_database_constraints(label="Premise")
+        await EvidenceRepository().add_database_constraints(label="Evidence")
     except Exception as e:
         logging.error(f"Error updating database constraints: {str(e)}")
         raise

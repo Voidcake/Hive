@@ -8,5 +8,4 @@ class Premise(BaseNode):
     author = AsyncRelationshipTo('src.app.user.user.User', 'AUTHORED_BY', cardinality=AsyncOne)
 
     claims = AsyncRelationshipFrom('src.app.arg_framework.claim.claim.Claim', 'HAS_PREMISE')
-
-    # TODO: evidence
+    evidence = AsyncRelationshipFrom('src.app.arg_framework.evidence.evidence.Evidence', 'SUPPORTS')
