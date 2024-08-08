@@ -62,10 +62,10 @@ class ClaimMutations:
 
     @mutation
     async def delete_claim(self, info: Info, claim_id: UUID, confirmation: bool = False) -> str:
-        uid: UUID = info.context.uid()
-
         if not confirmation:
             return "Confirmation required before deleting claim"
+
+        uid: UUID = info.context.uid()
 
         if await claim_service.check_ownership(user_id=uid, claim_id=claim_id):
             return await claim_service.delete_claim(claim_id)

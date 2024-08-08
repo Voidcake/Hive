@@ -71,6 +71,8 @@ class PremiseMutations:
         if not confirmation:
             return "Confirmation required to delete premise"
 
+        uid: UUID = await info.context.uid()
+
         if await premise_service.check_ownership(user_id=uid, premise_id=premise_id):
             return await premise_service.delete_premise(premise_id)
 

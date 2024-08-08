@@ -44,10 +44,10 @@ class QuestionMutations:
 
     @mutation
     async def delete_question(self, info: Info, question_id: UUID, confirmation: bool = False) -> str:
-        uid: UUID = await info.context.uid()
-
         if not confirmation:
             return "Confirmation required before deleting Question"
+
+        uid: UUID = await info.context.uid()
 
         if await question_service.check_ownership(user_id=uid, question_id=question_id):
             return await question_service.delete_question(question_id)
