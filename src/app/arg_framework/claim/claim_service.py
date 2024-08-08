@@ -59,6 +59,8 @@ class ClaimService(IOwnable, IAddressable):
     async def check_ownership(self, user_id: UUID, claim_id: UUID) -> bool:
         claim: Claim = await self.get_claim(claim_id)
         author: User = await claim.author.single()
+        if not author:
+            raise ValueError(f"Author of the Claim with ID '{claim_id}' not found")
 
         if author.uid != user_id.hex:
             raise PermissionError("You are not the author of this claim")

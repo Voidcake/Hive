@@ -41,6 +41,14 @@ class QuestionType(BaseNodeType):
         claim_nodes: List[Claim] | None = await self.node_instance.questions.all()
         return [ClaimType.from_node(claim_node) for claim_node in claim_nodes] if claim_nodes else None
 
+    @field
+    async def answered_by(self) -> List[
+                                       Annotated["ClaimType", lazy("src.app.arg_framework.claim.claim_schema")]] | None:
+        from src.app.arg_framework.claim.claim_schema import ClaimType
+
+        claim_nodes: List[Claim] | None = await self.node_instance.answered_by.all()
+        return [ClaimType.from_node(claim_node) for claim_node in claim_nodes] if claim_nodes else None
+
     @classmethod
     def from_node(cls, node: Question) -> "QuestionType":
         return QuestionType(

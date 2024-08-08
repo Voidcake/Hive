@@ -54,6 +54,8 @@ class PremiseService(IOwnable, IAddressable):
     async def check_ownership(self, user_id: UUID, premise_id: UUID) -> bool:
         premise: Premise = await self.get_premise(premise_id)
         author: User = await premise.author.single()
+        if not author:
+            raise ValueError(f"Author of the Premise with ID '{premise_id}' not found")
 
         if author.uid != user_id.hex:
             raise ValueError("You are not the author of this premise")

@@ -95,6 +95,8 @@ class EvidenceService(IAddressable, IOwnable):
     async def check_ownership(self, user_id: UUID, evidence_id: UUID) -> bool:
         evidence: Evidence = await self.evidence_repository.get(evidence_id)
         author: User = await evidence.author.single()
+        if not author:
+            raise ValueError(f"Author of the Evidence with ID '{evidence_id}' not found")
 
         if author.uid != user_id.hex:
             raise PermissionError("You are not the author of this evidence")

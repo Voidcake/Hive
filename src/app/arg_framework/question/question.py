@@ -12,4 +12,4 @@ class Question(BaseNode):
 
     # Claims
     questions = AsyncRelationshipTo('src.app.arg_framework.claim.claim.Claim', 'QUESTIONS', cardinality=AsyncZeroOrOne)
-    answered_by = AsyncRelationshipFrom('src.app.arg_framework.claim.claim.Claim', 'ANSWERED_BY')
+    answered_by = AsyncRelationshipFrom('src.app.arg_framework.claim.claim.Claim', 'ANSWERS')

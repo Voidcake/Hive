@@ -58,14 +58,12 @@ class QuestionService(IOwnable, IAddressable):
 
     async def check_ownership(self, user_id: UUID, question_id: UUID) -> bool:
         question: Question | None = await self.get_question(question_id)
-        if not question:
-            raise LookupError(f"The Question with ID '{question_id}' not found in the Database")
 
         author: User | None = await question.author.single()
         if not author:
             raise ValueError(f"Author of the Question with ID '{question_id}' not found")
 
-        if author.uid != user_id:
+        if author.uid != user_id.hex:
             raise PermissionError("You are not the author of this question")
 
         return True
