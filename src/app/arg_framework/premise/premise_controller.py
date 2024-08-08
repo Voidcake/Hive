@@ -43,7 +43,7 @@ class PremiseMutations:
             return PremiseType.from_node(premise)
 
     @mutation
-    async def address_node(self, info: Info, premise_id: UUID, claim_ids: List[UUID]) -> PremiseType:
+    async def address_claims(self, info: Info, premise_id: UUID, claim_ids: List[UUID]) -> PremiseType:
         uid: UUID = await info.context.uid()
 
         if await premise_service.check_ownership(user_id=uid, premise_id=premise_id):
@@ -68,8 +68,6 @@ class PremiseMutations:
 
     @mutation
     async def delete_premise(self, info: Info, confirmation: bool = False) -> str:
-        uid: UUID = await info.context.uid()
-
         if not confirmation:
             return "Confirmation required to delete premise"
 

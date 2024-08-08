@@ -83,8 +83,8 @@ class QuestionService(IOwnable, IAddressable):
         await question.questions.connect(target_node)
         return question
 
-    async def disconnect_node(self, source_node_id: UUID, target_node_id: UUID) -> Question:
-        question: Question = await self.get_question(source_node_id)
+    async def disconnect_node(self, source_node: UUID, target_node_id: UUID) -> Question:
+        question: Question = await self.get_question(source_node)
         target_node: AsyncStructuredNode = await self.question_repository.query_nodes(target_node_id)
 
         await question.questions.disconnect(target_node)

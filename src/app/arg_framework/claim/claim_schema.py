@@ -18,8 +18,8 @@ class RelationshipsType:
     node_instance: Private[Claim]
 
     @field
-    async def attacks(self) -> List[Annotated["ClaimType", lazy("src.app.arg_framework.claim.claim_schema")]]:
-        return [ClaimType.from_node(claim_node) for claim_node in await self.node_instance.attacks.all()]
+    async def counters(self) -> List[Annotated["ClaimType", lazy("src.app.arg_framework.claim.claim_schema")]]:
+        return [ClaimType.from_node(claim_node) for claim_node in await self.node_instance.counters.all()]
 
     @field
     async def supports(self) -> List[Annotated["ClaimType", lazy("src.app.arg_framework.claim.claim_schema")]]:
@@ -32,8 +32,8 @@ class RelationshipsType:
         return [QuestionType.from_node(question_node) for question_node in await self.node_instance.answers.all()]
 
     @field
-    async def attacked_by(self) -> List[Annotated["ClaimType", lazy("src.app.arg_framework.claim.claim_schema")]]:
-        return [ClaimType.from_node(claim_node) for claim_node in await self.node_instance.attacked_by.all()]
+    async def countered_by(self) -> List[Annotated["ClaimType", lazy("src.app.arg_framework.claim.claim_schema")]]:
+        return [ClaimType.from_node(claim_node) for claim_node in await self.node_instance.countered_by.all()]
 
     @field
     async def supported_by(self) -> List[Annotated["ClaimType", lazy("src.app.arg_framework.claim.claim_schema")]]:

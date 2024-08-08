@@ -64,12 +64,13 @@ class ClaimService(IOwnable, IAddressable):
             raise PermissionError("You are not the author of this claim")
         return True
 
+    # TODO: refactor signature into generic IAdresssable interface
     async def address_node(self, source_node: Claim, target_node_id: UUID,
                            relationship_type: AddressRelationship) -> Claim:
         target_node: AsyncStructuredNode = await self.claim_repository.query_nodes(target_node_id)
 
         if relationship_type == AddressRelationship.ATTACKS:
-            await source_node.attacks.connect(target_node)
+            await source_node.counters.connect(target_node)
         elif relationship_type == AddressRelationship.SUPPORTS:
             await source_node.supports.connect(target_node)
         elif relationship_type == AddressRelationship.ANSWERS:
@@ -79,8 +80,8 @@ class ClaimService(IOwnable, IAddressable):
 
         return source_node
 
-    async def disconnect_node(self, source_node_id: UUID, target_node_id: UUID) -> Claim:
-        claim: Claim = await self.get_claim(source_node_id)
+    async def disconnect_node(self, source_node: UUID, target_node_id: UUID) -> Claim:
+        claim: Claim = await self.get_claim(source_node)
         target_node: AsyncStructuredNode = await self.claim_repository.query_nodes(target_node_id)
 
         if target_node.__class__ == Question:
@@ -89,8 +90,8 @@ class ClaimService(IOwnable, IAddressable):
         elif target_node.__class__ == Claim and target_node in await claim.supports.all():
             await claim.supports.disconnect(target_node)
 
-        elif target_node.__class__ == Claim and target_node in await claim.attacks.all():
-            await claim.attacks.disconnect(target_node)
+        elif target_node.__class__ == Claim and target_node in await claim.counters.all():
+            await claim.counters.disconnect(target_node)
 
         else:
             raise ValueError("Relationship between the source node and target node not found or invalid")
