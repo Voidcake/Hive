@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from typing import List
 from uuid import UUID
 
@@ -66,9 +67,11 @@ class ClaimService(IOwnable, IAddressable):
             raise PermissionError("You are not the author of this claim")
         return True
 
-    # TODO: refactor signature into generic IAdresssable interface
-    async def address_node(self, source_node: Claim, target_node_id: UUID,
-                           relationship_type: AddressRelationship) -> Claim:
+    async def address_node(self, source_node: UUID | AsyncStructuredNode, target_node_id: UUID,
+                           relationship_type: Enum | None = None) -> Claim:
+        if type(source_node) is not Claim:
+            source_node: Claim = await self.get_claim(source_node)
+
         target_node: AsyncStructuredNode = await self.claim_repository.query_nodes(target_node_id)
 
         if relationship_type == AddressRelationship.ATTACKS:

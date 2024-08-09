@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from typing import List
 from uuid import UUID
 
@@ -74,11 +75,15 @@ class QuestionService(IOwnable, IAddressable):
     async def delete_question(self, question_id: UUID) -> str:
         return await self.question_repository.delete(question_id)
 
-    async def address_node(self, source_node: Question, target_node_id: UUID) -> Question:
-        question: Question = source_node
+    async def address_node(self, source_node: UUID | AsyncStructuredNode, target_node_id: UUID,
+                           relationship_type: Enum | None = None) -> AsyncStructuredNode:
+
+        if type(source_node) is not Question:
+            source_node: Question = await self.get_question(source_node)
+
         target_node: AsyncStructuredNode = await self.question_repository.query_nodes(target_node_id)
 
-        await question.questions.connect(target_node)
+        await source_node.questions.connect(target_node)
         return question
 
     async def disconnect_node(self, source_node: UUID, target_node_id: UUID) -> Question:

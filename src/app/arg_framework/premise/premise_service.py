@@ -1,8 +1,9 @@
 from datetime import datetime
+from enum import Enum
 from typing import List
 from uuid import UUID
 
-from neomodel import adb
+from neomodel import adb, AsyncStructuredNode
 
 from src.app.arg_framework.IAddressable import IAddressable
 from src.app.arg_framework.IOwnable import IOwnable
@@ -62,7 +63,11 @@ class PremiseService(IOwnable, IAddressable):
 
         return True
 
-    async def address_node(self, source_node: Premise, target_node_id: UUID) -> Premise:
+    async def address_node(self, source_node: UUID | AsyncStructuredNode, target_node_id: UUID,
+                           relationship_type: Enum | None = None) -> Premise:
+        if type(source_node) is not Premise:
+            source_node: Premise = await self.get_premise(source_node)
+
         target_node: Claim = await self.claim_repository.get(target_node_id)
 
         await source_node.claims.connect(target_node)
