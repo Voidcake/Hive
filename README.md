@@ -74,6 +74,25 @@ Planned features include:
 - Decision-support tools for facilitating group decision-making
 - RDF export capabilities for interoperability with other systems
 
+# Technical Overview
+
+Hive is built on a modular architecture that supports scalability and real-time data processing. The core components
+include:
+
+- User Interface [WIP]
+- Application Layer
+    - [FastAPI](https://fastapi.tiangolo.com/) - Web Framework
+    - [Strawberry](https://strawberry.rocks/) - [GraphQL](https://graphql.org/) API
+- Service Layer
+    - Argumentation Framework (Toulmin light) + Business Logic
+    - Graph & Vector Analysis Services [WIP]
+    - Data-access Layer
+    - DB Repositories
+    - Synchronisation Logic
+- Infrastructure Layer
+    - Graph DB - [Neo4j](https://neo4j.com/)
+    - Vector DB - [Chroma](https://www.trychroma.com/)
+
 # Contributing
 
 Fork the repository.
