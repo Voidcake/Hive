@@ -18,7 +18,8 @@ Read the [wiki](https://github.com/Voidcake/Hive/wiki) for more context.
 4. Technical Overview
 5. Contributing
 6. License
-7. Contact
+7. WIKI
+8. Contact
 
 # Installation
 
@@ -92,7 +93,7 @@ include:
     - Synchronisation Logic
 - Infrastructure Layer
     - Graph DB - [Neo4j](https://neo4j.com/)
-    - Vector DB - [Chroma](https://www.trychroma.com/)
+    - Vector DB - [Chroma](https://www.trychroma.com/) [WIP]
 
 # Contributing
 
