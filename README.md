@@ -23,6 +23,8 @@ Read the [wiki](https://github.com/Voidcake/Hive/wiki) for more context.
 
 # Installation
 
+Requirements: Python (version >= 3.12), Neo4j (version >= 5.0.0)
+
 Clone the repository:
 git clone https://github.com/Voidcake/Hive
 
@@ -43,7 +45,7 @@ Install the required packages:
 
 # Usage
 
-1. Create and run a local Neo4j database instance (version >= 5.0.0) or use
+1. Create and run a local Neo4j database instance or use
    a [hosted Neo4j instance](https://neo4j.com/cloud/platform/aura-graph-database/).
 2. Setup environment variables for the database connection details using the .env.example file as a template.
 3. Update the database connection details in the `config.py` file.
