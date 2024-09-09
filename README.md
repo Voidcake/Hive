@@ -88,7 +88,7 @@ include:
 - Service Layer
     - Argumentation Framework (Toulmin light) + Business Logic
     - Graph & Vector Analysis Services [WIP]
-    - Data-access Layer
+- Data-access Layer
     - DB Repositories
     - Synchronisation Logic
 - Infrastructure Layer
